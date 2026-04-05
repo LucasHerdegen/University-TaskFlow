@@ -3,15 +3,18 @@ package com.taskflow.taskservice.services;
 import com.taskflow.taskservice.dtos.TaskDto;
 import com.taskflow.taskservice.dtos.TaskPostDto;
 import com.taskflow.taskservice.entities.Task;
+import com.taskflow.taskservice.entities.TaskState;
 import com.taskflow.taskservice.repositories.TaskRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TaskService
 {
     private final TaskRepository repository;
@@ -45,5 +48,21 @@ public class TaskService
         repository.save(task);
 
         return new TaskDto(task.getId(), task.getTitle(), task.getSubject(), task.getExpirationDate(), task.getState());
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    @Transactional
+    public void markOverdueTasks()
+    {
+        System.out.println("Running task cleanup...");
+
+        var overdueTasks = repository.findByStateAndExpirationDateBefore(TaskState.OVERDUE, LocalDate.now());
+
+        System.out.println("Cleaning " + overdueTasks.size() + " tasks");
+
+        overdueTasks.forEach(t -> t.setState(TaskState.OVERDUE));
+        repository.saveAll(overdueTasks);
+
+        System.out.println("Cleaning finished");
     }
 }

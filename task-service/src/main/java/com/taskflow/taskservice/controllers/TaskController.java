@@ -45,14 +45,12 @@ public class TaskController
         if (task == null)
             return ResponseEntity.badRequest().build();
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(task.getId())
-                        .toUri());
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(task.getId())
+                .toUri();
 
-        return new ResponseEntity<>(httpHeaders, HttpStatus.CREATED);
+        return ResponseEntity.created(location).body(task);
     }
 }
