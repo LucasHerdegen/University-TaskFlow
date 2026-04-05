@@ -26,7 +26,7 @@ public class TaskController
         return service.getTask();
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<TaskDto> getTask(@PathVariable Long id)
     {
         var task = service.getTask(id);

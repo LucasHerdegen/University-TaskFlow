@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @Getter
 public class TaskPostDto
 {
-
     private String title;
 
     private String subject;
