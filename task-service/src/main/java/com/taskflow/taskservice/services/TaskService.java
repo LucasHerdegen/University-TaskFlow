@@ -6,6 +6,7 @@ import com.taskflow.taskservice.entities.Task;
 import com.taskflow.taskservice.entities.TaskState;
 import com.taskflow.taskservice.repositories.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,8 @@ import java.util.List;
 public class TaskService
 {
     private final TaskRepository repository;
+
+    private final RabbitTemplate rabbitTemplate;
 
     public List<TaskDto> getTask()
     {
@@ -46,6 +49,7 @@ public class TaskService
         var task = new Task(dto.getTitle(), dto.getSubject(), dto.getExpirationDate(), dto.getState());
 
         repository.save(task);
+        rabbitTemplate.convertAndSend("task.created.queue", "Se creo una nueva tarea: " + task.getTitle());
 
         return new TaskDto(task.getId(), task.getTitle(), task.getSubject(), task.getExpirationDate(), task.getState());
     }

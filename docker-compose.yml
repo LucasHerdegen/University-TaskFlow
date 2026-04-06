@@ -9,3 +9,24 @@ services:
     ports:
       - "5433:5432"
     restart: unless-stopped
+
+  mongo-db:
+    image: mongo:7.0
+    container_name: taskflow-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: taskflow-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: adminpassword
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
